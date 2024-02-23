@@ -22,7 +22,7 @@ public class User {
   private String password;
   private boolean isOrganizer;
 
-  public User(String username, String email, String password) {
+  public User(String email, String password) {
     this.email = email;
     this.password = password;
   }
