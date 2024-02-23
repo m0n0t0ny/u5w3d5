@@ -3,23 +3,21 @@ package u5w3d5.finalproject.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import u5w3d5.finalproject.entities.User;
 import u5w3d5.finalproject.exceptions.UnauthorizedException;
 
 import java.util.Date;
 
-@Service
+@Component
 public class JWTTools {
-
   @Value("${jwt.secret}")
   private String secret;
 
   public String createToken(User user) {
-    return Jwts.builder()
+    return Jwts.builder().subject(String.valueOf(user.getId()))
             .issuedAt(new Date(System.currentTimeMillis()))
-            .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-            .subject(String.valueOf(user.getId()))
+            .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
             .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
             .compact();
   }
@@ -28,15 +26,14 @@ public class JWTTools {
     try {
       Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(token);
     } catch (Exception ex) {
-      throw new UnauthorizedException("Token non valido. Effettua il login!");
+      throw new UnauthorizedException("Problemi col token! Per favore effettua di nuovo il login!");
     }
   }
 
   public String extractIdFromToken(String token) {
-    return Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
-            .build().parseSignedClaims(token).getPayload()
-            .getSubject();
+    return Jwts.parser()
+            .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+            .build()
+            .parseSignedClaims(token).getPayload().getSubject();
   }
-
-
 }

@@ -17,41 +17,40 @@ import u5w3d5.finalproject.services.UserService;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Component
-public class JWTFilter extends OncePerRequestFilter {
-
+public class JWTAuthFilter extends OncePerRequestFilter {
+  private static final AntPathMatcher pathMatcher = new AntPathMatcher();
   @Autowired
-  private JWTTools jwtTools;
-
+  private JWTTools jwTtools;
   @Autowired
-  private UserService usersService;
+  private UserService userService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
     String authHeader = request.getHeader("Authorization");
-    if (authHeader == null || !authHeader.startsWith("Bearer "))
-      throw new UnauthorizedException("Token not found");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedException("Per favore metti il token nell' Authorization header");
+    } else {
+      String accessToken = authHeader.substring(7);
+      jwTtools.verifyToken(accessToken);
 
-    String accessToken = authHeader.substring(7);
+      String id = jwTtools.extractIdFromToken(accessToken);
+      User user = userService.findById(UUID.fromString(id));
 
-    System.out.println("ACCESS TOKEN " + accessToken);
+      Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+      SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    jwtTools.verifyToken(accessToken);
-
-    String id = jwtTools.extractIdFromToken(accessToken);
-    User user = usersService.findById(UUID.fromString(id));
-
-    Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    filterChain.doFilter(request, response);
-
+      filterChain.doFilter(request, response);
+    }
   }
 
   @Override
-  protected boolean shouldNotFilter(HttpServletRequest request) {
-    return new AntPathMatcher().match("/auth/**", request.getServletPath());
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String[] allowedPaths = {"/auth/**", "/swagger-ui/**", "/v3/**"};
+
+    return Stream.of(allowedPaths)
+            .anyMatch(path -> pathMatcher.match(path, request.getServletPath()));
   }
 }
