@@ -7,11 +7,11 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Entity
-@Table(name = "bookings")
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
+@Table(name = "bookings")
 public class Booking {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,4 +24,9 @@ public class Booking {
   @ManyToOne
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   private Event event;
+
+  public Booking(User user, Event event) {
+    this.user = user;
+    this.event = event;
+  }
 }
