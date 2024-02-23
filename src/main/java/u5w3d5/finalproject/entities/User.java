@@ -1,30 +1,27 @@
 package u5w3d5.finalproject.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import u5w3d5.finalproject.Role;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
-@ToString
-@NoArgsConstructor
-@Entity
-@Table(name = "users")
-@JsonIgnoreProperties({"password", "credentialsNonExpired", "accountNonExpired", "authorities", "username", "accountNonLocked", "enabled"})
+@JsonIgnoreProperties({"password", "authorities", "accountNonExpired", "enabled", "accountNonLocked", "credentialsNonExpired"})
 public class User implements UserDetails {
   @Id
-  @GeneratedValue
+  @Setter(AccessLevel.NONE)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
   private String name;
   private String surname;
@@ -32,14 +29,9 @@ public class User implements UserDetails {
   private String password;
   @Enumerated(EnumType.STRING)
   private Role role;
-
-  public User(String name, String surname, String email, String password) {
-    this.name = name;
-    this.surname = surname;
-    this.email = email;
-    this.password = password;
-    this.role = Role.USER;
-  }
+  @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+  @JsonIgnore
+  private List<Booking> bookings;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -70,4 +62,5 @@ public class User implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
+
 }

@@ -1,32 +1,27 @@
 package u5w3d5.finalproject.entities;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@Table(name = "bookings")
+@Setter
+@Getter
 public class Booking {
   @Id
+  @Setter(AccessLevel.NONE)
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
-
+  private int participants;
+  private LocalDate bookingDate;
   @ManyToOne
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
-  private User user;
-
-  @ManyToOne
-  @JoinColumn(name = "event_id", referencedColumnName = "id")
+  @JoinColumn(name = "event_id")
   private Event event;
-
-  public Booking(User user, Event event) {
-    this.user = user;
-    this.event = event;
-  }
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
 }
