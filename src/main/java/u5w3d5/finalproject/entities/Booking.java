@@ -8,22 +8,20 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "bookings")
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class Booking {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
-  @Column(unique = true)
-  private String email;
-  private String password;
-  private boolean isOrganizer;
+  @ManyToOne
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  private User user;
+  @ManyToOne
+  @JoinColumn(name = "event_id", referencedColumnName = "id")
+  private Event event;
 
-  public User(String username, String email, String password) {
-    this.email = email;
-    this.password = password;
-  }
 }
