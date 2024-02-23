@@ -13,15 +13,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class Booking {
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
+
   @ManyToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;
+
   @ManyToOne
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   private Event event;
-
 }

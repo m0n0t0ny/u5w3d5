@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -13,7 +15,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class User {
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
@@ -21,6 +22,9 @@ public class User {
   private String email;
   private String password;
   private boolean isOrganizer;
+
+  @OneToMany(mappedBy = "user")
+  private List<Booking> bookings = new ArrayList<>();
 
   public User(String email, String password) {
     this.email = email;

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -14,7 +16,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class Event {
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
@@ -24,4 +25,6 @@ public class Event {
   private String location;
   private int availableSeats;
 
+  @OneToMany(mappedBy = "event")
+  private List<Booking> bookings = new ArrayList<>();
 }
